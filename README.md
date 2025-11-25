@@ -9,7 +9,7 @@ Post-quantum secure messenger MVP scaffold with a FastAPI backend, Docker-first 
 
 ## One-Command Setup
 ```bash
-git clone https://github.com/your-org/pqc-messenger.git \
+git clone https://gitlab.com/noorlatif/pqc-messenger.git \
   && cd pqc-messenger \
   && cp .env.example .env \
   && docker compose up --build
@@ -17,6 +17,11 @@ git clone https://github.com/your-org/pqc-messenger.git \
 The backend will hot-reload from `backend/app` and expose `http://localhost:8000/api/healthz`. Launch the Flutter shell in a second terminal with:
 ```bash
 cd frontend && flutter run
+```
+
+Subsequent backend runs:
+```bash
+docker compose up
 ```
 
 ## Directory Overview
@@ -42,7 +47,7 @@ docs/      # Contribution guide and future specs
 Within the sample `main.dart`, the helper displays the URL being used so developers can verify connectivity quickly.
 
 ## Docker Notes
-- `backend/Dockerfile` uses multi-stage builds on `python:3.13` to compile pinned `liboqs` and `liboqs-python` releases with `uv` for dependency management.
+- `backend/Dockerfile` uses multi-stage builds on `python:3.13` to compile pinned `liboqs` and `liboqs-python` releases with `uv` for dependency management. This might take a few minutes when run for the first time.
 - `docker-compose.yml` mounts `backend/app` for instant reloads and surfaces a `/api/healthz` endpoint used in the health check.
 
 ## Troubleshooting
