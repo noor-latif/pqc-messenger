@@ -1,5 +1,8 @@
 pytest
 pytest-asyncio
 httpx
+passlib[bcrypt]
+email-validator
+bcrypt<5
 ruff
 black

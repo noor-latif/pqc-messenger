@@ -50,4 +50,3 @@ users_by_email: Dict[str, str] = {}
 sessions_by_token: Dict[str, str] = {}
 keys_by_id: Dict[str, KeyRecord] = {}
 messages_by_id: Dict[str, MessageRecord] = {}
-

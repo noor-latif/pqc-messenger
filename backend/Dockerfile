@@ -31,6 +31,7 @@ RUN cmake -S liboqs -B liboqs/build -G Ninja \
     -DOQS_ENABLE_KEM_BIKE=ON \
     -DOQS_ENABLE_KEM_CLASSIC_MCELIECE=ON \
     -DOQS_ENABLE_KEM_HQC=ON \
+    -DOQS_ENABLE_SIG_dilithium_3=ON \
     && cmake --build liboqs/build \
     && cmake --install liboqs/build
 

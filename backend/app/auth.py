@@ -125,4 +125,3 @@ def login(payload: models.LoginRequest) -> models.LoginResponse:
         auth_token=auth_token,
         user_profile=_serialize_user_profile(user),
     )
-

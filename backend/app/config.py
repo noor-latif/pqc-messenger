@@ -25,9 +25,7 @@ class Settings(BaseSettings):
     environment: str = Field(default="development", alias="ENVIRONMENT")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     # Store as string to prevent Pydantic Settings from trying to JSON-decode
-    allowed_origins_str: str | None = Field(
-        default=None, alias="ALLOWED_ORIGINS", exclude=True
-    )
+    allowed_origins_str: str | None = Field(default=None, alias="ALLOWED_ORIGINS", exclude=True)
 
     @computed_field
     @property
@@ -42,5 +40,3 @@ class Settings(BaseSettings):
 def get_settings() -> Settings:
     """Return cached application settings instance."""
     return Settings()
-
-

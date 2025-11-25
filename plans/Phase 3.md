@@ -1,4 +1,4 @@
-# Phase 4: Frontend Core MVP (Flutter App, Basic User Journey)
+# Phase 3: Backend Tests MVP (Pytest, Code Quality, Validation)
 
 **Role:**  
 You are a coding assistant for a non-technical founder.  
@@ -6,105 +6,90 @@ After each step, provide a clear update (did it work, any output/errors, and ask
 
 ---
 
-## Step 1. Scaffold Frontend Project
+## Step 1. Prepare Dev Requirements
 
-1. Create `/frontend/lib` and `/frontend/test`.
-2. Initialize Flutter project, if not already:  
+1. In `/backend/requirements-dev.txt`, add:
     ```
-    flutter create frontend
+    pytest
+    pytest-asyncio
+    httpx
+    ruff
+    black
     ```
-    or manually arrange files as needed.
-3. Add minimal README to `/frontend`.
 
 **How to validate:**  
-- Show directory tree for `/frontend`.
+- Show contents of `requirements-dev.txt`.
 
 ---
 
-## Step 2. Implement Base URL Helper
+## Step 2. Add Test Directory & Fixtures
 
-1. In `/frontend/lib/utils/base_url_helper.dart`, add:
-    ```
-    import 'dart:io';
-    import 'package:flutter/foundation.dart' show kIsWeb;
-
-    class BaseUrlHelper {
-      static String getBaseUrl() {
-        if (kIsWeb) {
-          return 'http://localhost:8000';
-        } else if (Platform.isAndroid) {
-          return 'http://10.0.2.2:8000';
-        } else if (Platform.isIOS || Platform.isMacOS) {
-          return 'http://localhost:8000';
-        } else if (Platform.isWindows || Platform.isLinux) {
-          return 'http://127.0.0.1:8000';
-        }
-        return 'http://localhost:8000';
-      }
-    }
-    ```
+1. In `/backend/tests`, create:
+    - `__init__.py`
+    - `conftest.py` with FastAPI test client fixture and reset in-memory data.
 
 **How to validate:**  
-- Show file contents and run a unit test for the helper.
+- `ls backend/tests` should show the test files.
 
 ---
 
-## Step 3. Add MVP Screens
+## Step 3. Write Endpoint Unit Tests
 
-1. Create minimal screens (can be stateless widgets with static text initially) in `/frontend/lib/screens`:
-    - `onboarding_screen.dart` (headline + CTA button)
-    - `registration_screen.dart` (fields: email, password, display name, key toggle, Register button)
-    - `login_screen.dart` (fields: email, password, Sign In button)
-    - `key_confirmation_screen.dart` (shows current public key, Generate New Key button)
-    - `message_send_screen.dart` (recipient dropdown, text area, Send Message button)
+1. Create test modules:
+    - `test_auth.py` (register/login scenarios)
+    - `test_keys.py` (key generation)
+    - `test_messages.py` (send/verify message)
+    - `test_healthz.py` (health endpoint)
+2. Each test should use the FastAPI test client and cover expected success, typical edge cases, and validation failures.
 
 **How to validate:**  
-- Show navigation flow running locally:
+- Run all tests:
     ```
-    flutter run
+    docker compose run --rm backend pytest
     ```
-- Screenshot or summary of visible screens.
+- Show test run summary (number passed, failed, coverage).
 
 ---
 
-## Step 4. Implement API Client Service
+## Step 4. Add Code Quality Checks
 
-1. In `/frontend/lib/services/api_client.dart`, add:
-   - Functions for register, login, send message using the BaseUrlHelper for endpoint URLs.
-   - Use `http` package.
-2. For MVP, just handle JSON request/reply.
+1. Add `pyproject.toml` at `/backend` with Ruff and Black formatting/linting settings.
+2. Run inside Docker:
+    ```
+    docker compose run --rm backend ruff check .
+    docker compose run --rm backend black --check .
+    ```
 
 **How to validate:**  
-- Show code snippets and test registration/login against running backend.  
-- Print sample API response to console.
+- Paste output/results (should report “no errors found” if all is well).
 
 ---
 
-## Step 5. Local Dilithium Key Storage (Placeholder MVP)
+## Step 5. Validate CORS Whitelist Enforcement
 
-1. In `/frontend/lib/services/dilithium_service.dart`,  
-   - For now, stub out key gen and sign message with dummy base64 strings.
-   - Document in README how/when to replace with actual PQC integration.
+1. In `test_cors.py`, cover:
+    - Allowed origin succeeds (access-control-allow-origin present & correct).
+    - Disallowed origin fails (no CORS response).
 
 **How to validate:**  
-- Show placeholder public/private key output in UI.
+- Paste example test code and output/results from test run.
 
 ---
 
-## Step 6. Full User Journey Test
+## Step 6. Reporting and Troubleshooting
 
-1. Run app and confirm workflow:
-    - Onboarding → Registration → Key Confirmation → Message Send
-2. Use hardcoded recipients for MVP.
-
-**How to validate:**  
-- Print success message after sending test message: "Message sent securely"
-- Confirm signature verified status displayed
+- After running tests, report:
+    - Number of tests, coverage %, passing/failing status
+    - Any errors or ambiguous behaviors needing clarification
 
 ---
 
 ## After each step:  
 **Report:**
 - What was created/changed
-- UI/API/client output or errors (or summary)
-- Stop and ask for clarification if anything fails or is unclear
+- Test output, lint/format results, or error details
+- Stop and ask for clarification if anything fails or seems unclear
+
+---
+
+Ready for Phase 4?

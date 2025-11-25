@@ -73,4 +73,3 @@ class MessageSendRequest(BaseModel):
 class MessageSendResponse(BaseModel):
     message_id: str
     signature_valid: bool
-
