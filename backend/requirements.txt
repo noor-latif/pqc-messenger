@@ -1,0 +1,7 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+python-jose
+passlib[bcrypt]
+liboqs-python @ git+https://github.com/open-quantum-safe/liboqs-python@0.10.0
