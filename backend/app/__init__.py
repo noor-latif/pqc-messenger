@@ -1,0 +1,2 @@
+"""PQC Messenger backend application."""
+

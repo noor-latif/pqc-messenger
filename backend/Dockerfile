@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.6
 
 ARG PYTHON_VERSION=3.13
-ARG LIBOQS_REF=0.14.0
-ARG LIBOQS_PYTHON_REF=v0.14
+ARG LIBOQS_REF=0.8.0
+ARG LIBOQS_PYTHON_REF=v0.8.0
 
 FROM python:${PYTHON_VERSION} AS builder
 ARG LIBOQS_REF
@@ -32,6 +32,8 @@ RUN git clone --depth 1 --branch ${LIBOQS_REF} https://github.com/open-quantum-s
 RUN cmake -S liboqs -B liboqs/build -G Ninja \
     -DCMAKE_INSTALL_PREFIX=${LIBOQS_INSTALL_PREFIX} \
     -DBUILD_SHARED_LIBS=ON \
+    -DOQS_ENABLE_KEM_ml_kem_768=ON \
+    -DOQS_ENABLE_KEM_ml_kem_1024=ON \
     -DOQS_ENABLE_KEM_BIKE=ON \
     -DOQS_ENABLE_KEM_CLASSIC_MCELIECE=ON \
     -DOQS_ENABLE_KEM_HQC=ON \

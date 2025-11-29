@@ -92,7 +92,7 @@ class AppState extends ChangeNotifier {
     errorMessage = null;
     try {
       final result = await _apiClient.login(email: email, password: password);
-      authToken = result.authToken;
+      authToken = result.token; // Store JWT token
       notifyListeners();
       return true;
     } on ApiException catch (error) {

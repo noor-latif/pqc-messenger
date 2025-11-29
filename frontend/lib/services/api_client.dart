@@ -145,23 +145,15 @@ class RegisterResult {
 }
 
 class LoginResult {
-  LoginResult({
-    required this.authToken,
-    required this.displayName,
-    required this.userId,
-  });
+  LoginResult({required this.token, required this.redirect});
 
   factory LoginResult.fromJson(Map<String, dynamic> json) => LoginResult(
-    authToken: json['auth_token'] as String,
-    displayName:
-        (json['user_profile'] as Map<String, dynamic>)['display_name']
-            as String,
-    userId: (json['user_profile'] as Map<String, dynamic>)['user_id'] as String,
+    token: json['token'] as String,
+    redirect: json['redirect'] as String? ?? '/dashboard',
   );
 
-  final String authToken;
-  final String displayName;
-  final String userId;
+  final String token;
+  final String redirect;
 }
 
 class MessageSendResult {
