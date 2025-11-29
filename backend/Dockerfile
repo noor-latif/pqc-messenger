@@ -3,9 +3,9 @@
 #
 # Prerequisites:
 #   Build the base image first: make build-base
-#   Or use: docker build -f Dockerfile.base -t pqc-messenger-base:0.8.0 ./backend
+#   Or use: docker build -f Dockerfile.base -t pqc-messenger-base:0.12.0 ./backend
 
-ARG BASE_IMAGE=pqc-messenger-base:0.8.0
+ARG BASE_IMAGE=pqc-messenger-base:0.12.0
 ARG PYTHON_VERSION=3.13
 
 # Import base image as a stage

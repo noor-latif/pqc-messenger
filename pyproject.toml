@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pqc-messenger"
+version = "0.1.0"
+description = "PQC Messenger - Post-quantum secure messenger MVP"
+requires-python = ">=3.13"
+dependencies = [
+    "python-on-whales",
+]
+
+[project.scripts]
+build = "backend.build_base:main"
+
+[tool.setuptools.packages.find]
+include = ["backend*"]
+exclude = ["frontend*", "plans*", "docs*"]
+
+[tool.uv]
+package = true
+

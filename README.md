@@ -73,42 +73,9 @@ flutter test
 ```
 
 ## Docker Notes
-
-### Base Image for Faster Builds (Recommended)
-
-To save build time, we use a reusable base image with liboqs and liboqs-python pre-compiled:
-
-**First-time setup:**
-```bash
-# Build the base image (takes ~5-10 minutes, but only needs to be done once)
-cd backend
-./build-base.sh  # or build-base.ps1 on Windows
-
-# On Windows PowerShell:
-# .\build-base.ps1
-```
-
-**Subsequent builds:**
-```bash
-# Regular builds will now be much faster
-docker compose build
-docker compose up
-```
-
-The base image (`pqc-messenger-base:0.8.0`) contains pre-compiled liboqs with all required algorithms and the liboqs-python wheel. The main Dockerfile only needs to install Python dependencies and copy your app code, making builds significantly faster.
-
-### Manual Build Details
-
-- `backend/Dockerfile.base` builds the reusable base image with liboqs `0.8.0` and liboqs-python `v0.8.0`.
-- `backend/Dockerfile` extends the base image and adds application-specific dependencies.
-- The build uses Python 3.13 and `uv` for dependency management.
+- `backend/Dockerfile` uses multi-stage builds on `python:3.13` to compile pinned `liboqs` and `liboqs-python` releases with `uv` for dependency management. This might take a few minutes when run for the first time.
+- The build pins `liboqs` `0.8.0` and `liboqs-python` `v0.8.0` for Phase 1. Override with `docker compose build --build-arg LIBOQS_REF=<tag> --build-arg LIBOQS_PYTHON_REF=<branch-or-tag> backend` when newer releases ship.
 - `docker-compose.yml` mounts `backend/app` for instant reloads and surfaces a `/api/healthz` endpoint used in the health check.
-
-To build with different liboqs versions, override the base image:
-```bash
-LIBOQS_REF=0.9.0 LIBOQS_PYTHON_REF=v0.9.0 ./build-base.sh
-BASE_IMAGE=pqc-messenger-base:0.9.0 docker compose build
-```
 
 ## Troubleshooting
 | Symptom | Fix |

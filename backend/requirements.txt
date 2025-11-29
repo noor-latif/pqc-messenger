@@ -6,4 +6,4 @@ email-validator
 pyjwt>=2.8.0
 argon2-cffi>=23.1.0
 sqlalchemy>=2.0.0
-liboqs-python @ git+https://github.com/open-quantum-safe/liboqs-python@v0.8.0
+liboqs-python @ git+https://github.com/open-quantum-safe/liboqs-python@v0.12.0
