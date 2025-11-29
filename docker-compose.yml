@@ -1,1 +1,27 @@
-
+services:
+  backend:
+    image: pqc-messenger-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        PYTHON_VERSION: 3.13
+        LIBOQS_REF: 0.12.0
+        LIBOQS_PYTHON_REF: 0.12.0
+    container_name: pqc-messenger-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app
+    env_file:
+      - .env
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped

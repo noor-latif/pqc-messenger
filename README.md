@@ -4,6 +4,7 @@ Post-quantum secure messenger MVP scaffold with a FastAPI backend, Docker-first 
 
 ## Prerequisites
 - Docker Desktop (macOS/Windows) or Docker Engine (Linux/WSL2)
+- Python 3.9+ with `python-on-whales` package (install with `pip install python-on-whales` or `uv pip install python-on-whales`)
 - Flutter SDK 3.24.0+ (with Dart)
 - Git 2.40+
 
@@ -12,9 +13,9 @@ Post-quantum secure messenger MVP scaffold with a FastAPI backend, Docker-first 
 git clone https://gitlab.com/noorlatif/pqc-messenger.git \
   && cd pqc-messenger \
   && cp .env.example .env \
-  && docker compose up --build
+  && python build.py --start
 ```
-The backend will hot-reload from `backend/app` and expose `http://localhost:8000/api/healthz`. Launch the Flutter shell in a second terminal with:
+The build script will automatically check for and build the base image if needed, then build and start the backend. The backend will hot-reload from `backend/app` and expose `http://localhost:8000/api/healthz`. Launch the Flutter shell in a second terminal with:
 ```bash
 cd frontend && flutter run
 ```
@@ -22,6 +23,11 @@ cd frontend && flutter run
 Subsequent backend runs:
 ```bash
 docker compose up
+```
+
+Or use the build script:
+```bash
+python build.py --start
 ```
 
 ## Directory Overview
@@ -49,13 +55,13 @@ Within the sample `main.dart`, the helper displays the URL being used so develop
 ## Phase 1 Implementation Status
 
 This project implements Phase 1 of the PQC WhatsApp PoC plan with:
-- **Backend**: FastAPI with SQLAlchemy (SQLite), Argon2id password hashing, JWT authentication, ML-KEM (Kyber) via liboqs v0.8.0
+- **Backend**: FastAPI with SQLAlchemy (SQLite), Argon2id password hashing, JWT authentication, ML-KEM (Kyber) via liboqs v0.12.0
 - **Frontend**: Flutter login screen with blue accent (#1976D2), JWT token storage, dashboard navigation
 - **Authentication**: `/api/auth/login` endpoint that validates credentials, performs ML-KEM handshake, and issues JWT tokens
 
 ### PQC Decisions (Phase 1)
 - **Password Hashing**: Argon2id via `argon2-cffi` for quantum-resistant password storage
-- **Key Exchange**: ML-KEM-768/1024 (Kyber) via liboqs v0.8.0 for post-quantum key encapsulation
+- **Key Exchange**: ML-KEM-768/1024 (Kyber) via liboqs v0.12.0 for post-quantum key encapsulation
 - **JWT Signing**: HS256 with configurable secret key (enhanced with ML-KEM shared secret in production)
 
 ### Running Tests
@@ -73,9 +79,18 @@ flutter test
 ```
 
 ## Docker Notes
-- `backend/Dockerfile` uses multi-stage builds on `python:3.13` to compile pinned `liboqs` and `liboqs-python` releases with `uv` for dependency management. This might take a few minutes when run for the first time.
-- The build pins `liboqs` `0.8.0` and `liboqs-python` `v0.8.0` for Phase 1. Override with `docker compose build --build-arg LIBOQS_REF=<tag> --build-arg LIBOQS_PYTHON_REF=<branch-or-tag> backend` when newer releases ship.
+- The build process uses a two-stage approach:
+  - **Base image** (`pqc-messenger-base:0.12.0`): Contains pre-built `liboqs` and `liboqs-python` wheel. Built once and reused.
+  - **Application image**: FastAPI backend using the base image. Rebuilds quickly when app code changes.
+- The `build.py` script automatically checks for and builds the base image if missing. This might take a few minutes when run for the first time.
+- The build pins `liboqs` `0.12.0` and `liboqs-python` `0.12.0` for Phase 1. Override by setting environment variables when running `build.py`:
+  ```bash
+  LIBOQS_REF=0.12.0 LIBOQS_PYTHON_REF=0.12.0 python build.py
+  ```
 - `docker-compose.yml` mounts `backend/app` for instant reloads and surfaces a `/api/healthz` endpoint used in the health check.
+- **Alternative build methods**:
+  - Direct Python script: `python build.py` (builds without starting) or `python build.py --start` (builds and starts)
+  - Manual Docker Compose: `docker compose build` and `docker compose up` (requires base image to exist first)
 
 ## Troubleshooting
 | Symptom | Fix |
