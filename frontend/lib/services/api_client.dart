@@ -56,16 +56,18 @@ class ApiClient {
     required String authToken,
     required String recipientId,
     required String messageBody,
-    required String signature,
+    String? signature,
     required String publicKeyId,
   }) async {
     final payload = {
       'auth_token': authToken,
       'recipient_id': recipientId,
       'message_body': messageBody,
-      'signature': signature,
       'public_key_id': publicKeyId,
     };
+    if (signature != null) {
+      payload['signature'] = signature;
+    }
     final json = await _postJson('/api/messages/send', payload);
     return MessageSendResult.fromJson(json);
   }
@@ -151,10 +153,10 @@ class LoginResult {
 
   factory LoginResult.fromJson(Map<String, dynamic> json) => LoginResult(
         authToken: json['auth_token'] as String,
-        displayName: (json['user_profile'] as Map<String, dynamic>)['display_name']
-            as String,
-        userId: (json['user_profile'] as Map<String, dynamic>)['user_id']
-            as String,
+        displayName: (json['user_profile']
+            as Map<String, dynamic>)['display_name'] as String,
+        userId:
+            (json['user_profile'] as Map<String, dynamic>)['user_id'] as String,
       );
 
   final String authToken;
@@ -177,5 +179,3 @@ class MessageSendResult {
   final String messageId;
   final bool signatureValid;
 }
-
-

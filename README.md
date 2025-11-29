@@ -48,6 +48,7 @@ Within the sample `main.dart`, the helper displays the URL being used so develop
 
 ## Docker Notes
 - `backend/Dockerfile` uses multi-stage builds on `python:3.13` to compile pinned `liboqs` and `liboqs-python` releases with `uv` for dependency management. This might take a few minutes when run for the first time.
+- The build pins `liboqs` `0.14.0` and `liboqs-python` `v0.14` to keep the shared library and Python bindings in sync. Override with `docker compose build --build-arg LIBOQS_REF=<tag> --build-arg LIBOQS_PYTHON_REF=<branch-or-tag> backend` when newer releases ship.
 - `docker-compose.yml` mounts `backend/app` for instant reloads and surfaces a `/api/healthz` endpoint used in the health check.
 
 ## Troubleshooting

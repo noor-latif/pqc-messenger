@@ -38,6 +38,23 @@ def test_message_send_success(client: TestClient) -> None:
     assert body["signature_valid"] is False
 
 
+def test_message_send_server_signed(client: TestClient) -> None:
+    user = _register_user(client)
+
+    resp = client.post(
+        "/api/messages/send",
+        json={
+            "auth_token": user["auth_token"],
+            "recipient_id": "recipient-123",
+            "message_body": "Hello PQC",
+            "public_key_id": user["key_id"],
+        },
+    )
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["signature_valid"] is True
+
+
 def test_message_send_unknown_key(client: TestClient) -> None:
     user = _register_user(client)
     fake_signature = base64.b64encode(b"fake-sig").decode()

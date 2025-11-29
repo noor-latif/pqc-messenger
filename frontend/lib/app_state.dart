@@ -135,21 +135,35 @@ class AppState extends ChangeNotifier {
         return true;
       }
 
-      final signature = await _dilithiumService.signMessage(
-        privateKey: privateKey ?? 'server-protected',
-        message: messageBody,
-      );
-      final result = await _apiClient.sendMessage(
-        authToken: authToken!,
-        recipientId: recipient.id,
-        messageBody: messageBody,
-        signature: signature,
-        publicKeyId: keyId!,
-      );
+      MessageSendResult result;
+      if (privateKey == null) {
+        result = await _apiClient.sendMessage(
+          authToken: authToken!,
+          recipientId: recipient.id,
+          messageBody: messageBody,
+          publicKeyId: keyId!,
+        );
+        lastSignatureStatus = result.signatureValid
+            ? 'Server-side signature verified'
+            : 'Server-side signature rejected';
+        infoMessage = 'Message signed by server-managed key.';
+      } else {
+        final signature = await _dilithiumService.signMessage(
+          privateKey: privateKey!,
+          message: messageBody,
+        );
+        result = await _apiClient.sendMessage(
+          authToken: authToken!,
+          recipientId: recipient.id,
+          messageBody: messageBody,
+          signature: signature,
+          publicKeyId: keyId!,
+        );
+        lastSignatureStatus =
+            result.signatureValid ? 'Signature verified' : 'Signature rejected';
+        infoMessage = 'Message sent securely.';
+      }
       lastMessageId = result.messageId;
-      lastSignatureStatus =
-          result.signatureValid ? 'Signature verified' : 'Signature rejected';
-      infoMessage = 'Message sent securely.';
       notifyListeners();
       return true;
     } on ApiException catch (error) {
@@ -206,4 +220,3 @@ class AppStateProvider extends InheritedNotifier<AppState> {
   bool updateShouldNotify(covariant AppStateProvider oldWidget) =>
       notifier != oldWidget.notifier;
 }
-

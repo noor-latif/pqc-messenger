@@ -30,8 +30,11 @@ class FakeSignature:
     def export_secret_key(self) -> bytes:
         return self._secret_key
 
+    def sign(self, message: bytes) -> bytes:
+        return b"signed-" + message
+
     def verify(self, message: bytes, signature: bytes, public_key: bytes) -> bool:
-        return False
+        return signature == b"signed-" + message
 
 
 class MechanismNotSupportedError(Exception):

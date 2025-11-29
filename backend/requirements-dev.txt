@@ -3,6 +3,6 @@ pytest-asyncio
 httpx
 passlib[bcrypt]
 email-validator
-bcrypt<5
+bcrypt>=4.1.2,<5
 ruff
 black

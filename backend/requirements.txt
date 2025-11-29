@@ -5,5 +5,5 @@ pydantic-settings
 email-validator
 python-jose
 passlib[bcrypt]
-bcrypt<5
-liboqs-python @ git+https://github.com/open-quantum-safe/liboqs-python@0.10.0
+bcrypt>=4.1.2,<5
+liboqs-python @ git+https://github.com/open-quantum-safe/liboqs-python@f6f938d2787c7f29358d6fc268cdcfe4dc86eeab

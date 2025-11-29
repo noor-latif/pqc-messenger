@@ -24,6 +24,15 @@ This package hosts the Flutter MVP that walks a user through onboarding, account
    ```bash
    flutter run
    ```
+4. Target platform-specific builds as needed:
+   - Windows desktop:
+     ```bash
+     flutter run -d windows
+     ```
+   - Web (Chrome or Edge):
+     ```bash
+     flutter run -d chrome
+     ```
 
 ### Testing
 

@@ -32,75 +32,86 @@ class _MessageSendScreenState extends State<MessageSendScreen> {
           appBar: AppBar(
             title: const Text('Send secure message'),
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DropdownButtonFormField<String>(
-                  value: selected.id,
-                  decoration: const InputDecoration(
-                    labelText: 'Recipient',
-                  ),
-                  items: recipients
-                      .map(
-                        (recipient) => DropdownMenuItem(
-                          value: recipient.id,
-                          child: Text(recipient.name),
+          body: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DropdownButtonFormField<String>(
+                          value: selected.id,
+                          decoration: const InputDecoration(
+                            labelText: 'Recipient',
+                          ),
+                          items: recipients
+                              .map(
+                                (recipient) => DropdownMenuItem(
+                                  value: recipient.id,
+                                  child: Text(recipient.name),
+                                ),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              appState.selectRecipient(value);
+                            }
+                          },
                         ),
-                      )
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      appState.selectRecipient(value);
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _messageController,
-                  maxLines: 5,
-                  decoration: const InputDecoration(
-                    labelText: 'Message',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text('Public key id: ${appState.keyId ?? '—'}'),
-                const SizedBox(height: 4),
-                Text(
-                  'Signature status: ${appState.lastSignatureStatus ?? 'n/a'}',
-                ),
-                const Spacer(),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: appState.isBusy
-                        ? null
-                        : () => _sendMessage(appState, context),
-                    child: appState.isBusy
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Send Message'),
-                  ),
-                ),
-                if (appState.infoMessage != null) ...[
-                  const SizedBox(height: 12),
-                  Text(appState.infoMessage!),
-                ],
-                if (appState.errorMessage != null) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    appState.errorMessage!,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.error,
+                        const SizedBox(height: 16),
+                        TextField(
+                          controller: _messageController,
+                          maxLines: 5,
+                          decoration: const InputDecoration(
+                            labelText: 'Message',
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text('Public key id: ${appState.keyId ?? '—'}'),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Signature status: ${appState.lastSignatureStatus ?? 'n/a'}',
+                        ),
+                        const Spacer(),
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton(
+                            onPressed: appState.isBusy
+                                ? null
+                                : () => _sendMessage(appState, context),
+                            child: appState.isBusy
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Text('Send Message'),
+                          ),
+                        ),
+                        if (appState.infoMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Text(appState.infoMessage!),
+                        ],
+                        if (appState.errorMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            appState.errorMessage!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                ],
-              ],
+                ),
+              ),
             ),
           ),
         );
@@ -134,5 +145,3 @@ class _MessageSendScreenState extends State<MessageSendScreen> {
     }
   }
 }
-
-

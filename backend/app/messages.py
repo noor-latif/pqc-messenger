@@ -47,8 +47,26 @@ def send_message(payload: models.MessageSendRequest) -> models.MessageSendRespon
         )
 
     public_key_bytes = _b64_decode(key_record.public_key_b64)
-    signature_bytes = _b64_decode(payload.signature)
+    signature_input = payload.signature or ""
+    signature_was_provided = bool(signature_input.strip())
+
     message_bytes = payload.message_body.encode("utf-8")
+
+    if signature_was_provided:
+        signature_bytes = _b64_decode(signature_input)
+        signature_b64 = signature_input
+    else:
+        if not key_record.private_key_b64:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=(
+                    "Signature is required when the selected key is marked as client-managed."
+                ),
+            )
+        secret_key_bytes = _b64_decode(key_record.private_key_b64)
+        with oqs.Signature(key_record.algorithm, secret_key_bytes) as signer:
+            signature_bytes = signer.sign(message_bytes)
+        signature_b64 = base64.b64encode(signature_bytes).decode("ascii")
 
     try:
         with oqs.Signature(key_record.algorithm) as verifier:
@@ -67,7 +85,7 @@ def send_message(payload: models.MessageSendRequest) -> models.MessageSendRespon
         sender_id=sender.user_id,
         recipient_id=payload.recipient_id,
         message_body=payload.message_body,
-        signature_b64=payload.signature,
+        signature_b64=signature_b64,
         public_key_id=payload.public_key_id,
         signature_valid=signature_valid,
         created_at=datetime.now(tz=timezone.utc),
