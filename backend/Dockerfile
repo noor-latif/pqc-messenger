@@ -1,49 +1,20 @@
 # syntax=docker/dockerfile:1.6
+# Main application Dockerfile - uses pre-built base image with liboqs
+#
+# Prerequisites:
+#   Build the base image first: make build-base
+#   Or use: docker build -f Dockerfile.base -t pqc-messenger-base:0.8.0 ./backend
 
+ARG BASE_IMAGE=pqc-messenger-base:0.8.0
 ARG PYTHON_VERSION=3.13
-ARG LIBOQS_REF=0.8.0
-ARG LIBOQS_PYTHON_REF=v0.8.0
 
-FROM python:${PYTHON_VERSION} AS builder
-ARG LIBOQS_REF
-ARG LIBOQS_PYTHON_REF
+# Import base image as a stage
+FROM ${BASE_IMAGE} AS base
 
-ENV PATH="/root/.local/bin:${PATH}" \
-    VIRTUAL_ENV="/opt/venv" \
-    LIBOQS_INSTALL_PREFIX="/opt/liboqs"
+FROM base AS builder
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    git \
-    libffi-dev \
-    libssl-dev \
-    ninja-build \
-    pkg-config \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-WORKDIR /build
-
-# Compile liboqs from source
-RUN git clone --depth 1 --branch ${LIBOQS_REF} https://github.com/open-quantum-safe/liboqs.git
-RUN cmake -S liboqs -B liboqs/build -G Ninja \
-    -DCMAKE_INSTALL_PREFIX=${LIBOQS_INSTALL_PREFIX} \
-    -DBUILD_SHARED_LIBS=ON \
-    -DOQS_ENABLE_KEM_ml_kem_768=ON \
-    -DOQS_ENABLE_KEM_ml_kem_1024=ON \
-    -DOQS_ENABLE_KEM_BIKE=ON \
-    -DOQS_ENABLE_KEM_CLASSIC_MCELIECE=ON \
-    -DOQS_ENABLE_KEM_HQC=ON \
-    -DOQS_ENABLE_SIG_dilithium_3=ON \
-    && cmake --build liboqs/build \
-    && cmake --install liboqs/build
-
-# Compile liboqs-python wheel to install later
-RUN git clone --depth 1 --branch ${LIBOQS_PYTHON_REF} https://github.com/open-quantum-safe/liboqs-python.git
-RUN LIBOQS_INSTALL_PATH=${LIBOQS_INSTALL_PREFIX} python -m pip wheel ./liboqs-python -w /tmp/wheels
+ENV VIRTUAL_ENV="/opt/venv" \
+    PATH="/opt/venv/bin:${PATH}"
 
 RUN python -m venv ${VIRTUAL_ENV}
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
@@ -51,8 +22,18 @@ ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 WORKDIR /app
 COPY requirements.txt .
 
-RUN uv pip install --no-cache-dir -r requirements.txt
-RUN uv pip install --no-cache-dir /tmp/wheels/liboqs_python*.whl
+# Install Python dependencies (remove liboqs-python from git install since we use wheel)
+RUN uv pip install --no-cache-dir \
+    fastapi \
+    uvicorn[standard] \
+    pydantic \
+    pydantic-settings \
+    email-validator \
+    "pyjwt>=2.8.0" \
+    "argon2-cffi>=23.1.0" \
+    "sqlalchemy>=2.0.0"
+# Install liboqs-python from pre-built wheel in base image
+RUN /usr/local/bin/install-liboqs-python
 
 FROM python:${PYTHON_VERSION} AS runtime
 
@@ -67,7 +48,8 @@ ENV VIRTUAL_ENV="/opt/venv" \
 
 WORKDIR /app
 
-COPY --from=builder ${LIBOQS_INSTALL_PREFIX} ${LIBOQS_INSTALL_PREFIX}
+# Copy liboqs from base image and virtual environment from builder
+COPY --from=base ${LIBOQS_INSTALL_PREFIX} ${LIBOQS_INSTALL_PREFIX}
 COPY --from=builder ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 
 COPY app .

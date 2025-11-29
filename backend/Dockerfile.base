@@ -1,0 +1,90 @@
+# syntax=docker/dockerfile:1.6
+# Base image with liboqs and liboqs-python pre-built
+# Build this image once and reuse it to speed up development builds
+#
+# Usage:
+#   docker build -f Dockerfile.base -t pqc-messenger-base:0.8.0 \
+#     --build-arg PYTHON_VERSION=3.13 \
+#     --build-arg LIBOQS_REF=0.8.0 \
+#     --build-arg LIBOQS_PYTHON_REF=v0.8.0 \
+#     ./backend
+
+ARG PYTHON_VERSION=3.13
+ARG LIBOQS_REF=0.8.0
+ARG LIBOQS_PYTHON_REF=v0.8.0
+
+FROM python:${PYTHON_VERSION} AS base
+ARG LIBOQS_REF
+ARG LIBOQS_PYTHON_REF
+
+ENV PATH="/root/.local/bin:${PATH}" \
+    LIBOQS_INSTALL_PREFIX="/opt/liboqs"
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
+    libffi-dev \
+    libssl-dev \
+    ninja-build \
+    pkg-config \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv package manager
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+WORKDIR /build
+
+# Compile liboqs from source
+RUN git clone --depth 1 --branch ${LIBOQS_REF} https://github.com/open-quantum-safe/liboqs.git
+RUN cmake -S liboqs -B liboqs/build -G Ninja \
+    -DCMAKE_INSTALL_PREFIX=${LIBOQS_INSTALL_PREFIX} \
+    -DBUILD_SHARED_LIBS=ON \
+    -DOQS_ENABLE_KEM_ml_kem_768=ON \
+    -DOQS_ENABLE_KEM_ml_kem_1024=ON \
+    -DOQS_ENABLE_KEM_BIKE=ON \
+    -DOQS_ENABLE_KEM_CLASSIC_MCELIECE=ON \
+    -DOQS_ENABLE_KEM_HQC=ON \
+    -DOQS_ENABLE_SIG_dilithium_3=ON \
+    && cmake --build liboqs/build \
+    && cmake --install liboqs/build
+
+# Compile liboqs-python wheel
+RUN git clone --depth 1 --branch ${LIBOQS_PYTHON_REF} https://github.com/open-quantum-safe/liboqs-python.git
+RUN LIBOQS_INSTALL_PATH=${LIBOQS_INSTALL_PREFIX} python -m pip wheel ./liboqs-python -w /tmp/wheels
+
+# Create final base image with liboqs and wheel
+FROM python:${PYTHON_VERSION}
+ARG LIBOQS_REF
+ARG LIBOQS_PYTHON_REF
+
+LABEL maintainer="PQC Messenger"
+LABEL description="Base image with liboqs and liboqs-python pre-built"
+LABEL liboqs.ref="${LIBOQS_REF}"
+LABEL liboqs-python.ref="${LIBOQS_PYTHON_REF}"
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install uv package manager for runtime
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+ENV PATH="/root/.local/bin:${PATH}" \
+    LIBOQS_INSTALL_PREFIX="/opt/liboqs" \
+    LD_LIBRARY_PATH="/opt/liboqs/lib:${LD_LIBRARY_PATH}"
+
+# Copy liboqs installation and wheel from builder
+COPY --from=base ${LIBOQS_INSTALL_PREFIX} ${LIBOQS_INSTALL_PREFIX}
+COPY --from=base /tmp/wheels/liboqs_python*.whl /opt/wheels/
+
+# Create a script to install the wheel (can be called by derived images)
+RUN echo '#!/bin/sh\n\
+uv pip install --no-cache-dir /opt/wheels/liboqs_python*.whl' > /usr/local/bin/install-liboqs-python && \
+    chmod +x /usr/local/bin/install-liboqs-python
+
+WORKDIR /app
+

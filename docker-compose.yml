@@ -4,9 +4,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
       args:
+        BASE_IMAGE: ${BASE_IMAGE:-pqc-messenger-base:0.8.0}
         PYTHON_VERSION: 3.13
-        LIBOQS_REF: 0.8.0
-        LIBOQS_PYTHON_REF: v0.8.0
     ports:
       - "8000:8000"
     volumes:
