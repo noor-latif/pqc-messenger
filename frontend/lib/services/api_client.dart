@@ -19,8 +19,8 @@ class ApiException implements Exception {
 
 class ApiClient {
   ApiClient({http.Client? httpClient, String? baseUrl})
-      : _httpClient = httpClient ?? http.Client(),
-        _baseUrl = baseUrl ?? BaseUrlHelper.getBaseUrl();
+    : _httpClient = httpClient ?? http.Client(),
+      _baseUrl = baseUrl ?? BaseUrlHelper.getBaseUrl();
 
   final http.Client _httpClient;
   final String _baseUrl;
@@ -132,11 +132,11 @@ class RegisterResult {
   });
 
   factory RegisterResult.fromJson(Map<String, dynamic> json) => RegisterResult(
-        userId: json['user_id'] as String,
-        authToken: json['auth_token'] as String,
-        keyId: json['key_id'] as String?,
-        publicKey: json['public_key'] as String?,
-      );
+    userId: json['user_id'] as String,
+    authToken: json['auth_token'] as String,
+    keyId: json['key_id'] as String?,
+    publicKey: json['public_key'] as String?,
+  );
 
   final String userId;
   final String authToken;
@@ -152,12 +152,12 @@ class LoginResult {
   });
 
   factory LoginResult.fromJson(Map<String, dynamic> json) => LoginResult(
-        authToken: json['auth_token'] as String,
-        displayName: (json['user_profile']
-            as Map<String, dynamic>)['display_name'] as String,
-        userId:
-            (json['user_profile'] as Map<String, dynamic>)['user_id'] as String,
-      );
+    authToken: json['auth_token'] as String,
+    displayName:
+        (json['user_profile'] as Map<String, dynamic>)['display_name']
+            as String,
+    userId: (json['user_profile'] as Map<String, dynamic>)['user_id'] as String,
+  );
 
   final String authToken;
   final String displayName;
@@ -165,10 +165,7 @@ class LoginResult {
 }
 
 class MessageSendResult {
-  MessageSendResult({
-    required this.messageId,
-    required this.signatureValid,
-  });
+  MessageSendResult({required this.messageId, required this.signatureValid});
 
   factory MessageSendResult.fromJson(Map<String, dynamic> json) =>
       MessageSendResult(

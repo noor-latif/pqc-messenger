@@ -29,9 +29,7 @@ class _MessageSendScreenState extends State<MessageSendScreen> {
         final recipients = appState.recipients;
         final selected = appState.selectedRecipient ?? recipients.first;
         return Scaffold(
-          appBar: AppBar(
-            title: const Text('Send secure message'),
-          ),
+          appBar: AppBar(title: const Text('Send secure message')),
           body: LayoutBuilder(
             builder: (context, constraints) => SingleChildScrollView(
               child: ConstrainedBox(
@@ -122,9 +120,9 @@ class _MessageSendScreenState extends State<MessageSendScreen> {
   Future<void> _sendMessage(AppState appState, BuildContext context) async {
     final message = _messageController.text.trim();
     if (message.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Message cannot be empty')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Message cannot be empty')));
       return;
     }
 
@@ -134,14 +132,14 @@ class _MessageSendScreenState extends State<MessageSendScreen> {
     }
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Message sent securely')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Message sent securely')));
       _messageController.clear();
     } else if (appState.errorMessage != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(appState.errorMessage!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(appState.errorMessage!)));
     }
   }
 }

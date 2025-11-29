@@ -14,8 +14,8 @@ class AppState extends ChangeNotifier {
   AppState({
     required ApiClient apiClient,
     required DilithiumService dilithiumService,
-  })  : _apiClient = apiClient,
-        _dilithiumService = dilithiumService {
+  }) : _apiClient = apiClient,
+       _dilithiumService = dilithiumService {
     selectedRecipient = recipients.first;
   }
 
@@ -159,8 +159,9 @@ class AppState extends ChangeNotifier {
           signature: signature,
           publicKeyId: keyId!,
         );
-        lastSignatureStatus =
-            result.signatureValid ? 'Signature verified' : 'Signature rejected';
+        lastSignatureStatus = result.signatureValid
+            ? 'Signature verified'
+            : 'Signature rejected';
         infoMessage = 'Message sent securely.';
       }
       lastMessageId = result.messageId;
@@ -208,8 +209,8 @@ class AppStateProvider extends InheritedNotifier<AppState> {
   }) : super(notifier: notifier, child: child);
 
   static AppState of(BuildContext context) {
-    final provider =
-        context.dependOnInheritedWidgetOfExactType<AppStateProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<AppStateProvider>();
     if (provider == null) {
       throw StateError('AppStateProvider not found in widget tree');
     }
