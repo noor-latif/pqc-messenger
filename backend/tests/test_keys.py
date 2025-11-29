@@ -40,3 +40,4 @@ def test_generate_key_requires_valid_token(client: TestClient) -> None:
     assert resp.json()["detail"] == "Invalid or expired auth token."
 
 
+

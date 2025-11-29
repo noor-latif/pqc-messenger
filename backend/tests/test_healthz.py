@@ -9,3 +9,4 @@ def test_health_endpoint(client: TestClient) -> None:
     assert resp.json() == {"status": "ok"}
 
 
+

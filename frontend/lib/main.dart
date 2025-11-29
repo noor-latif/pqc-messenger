@@ -1,44 +1,63 @@
 import 'package:flutter/material.dart';
 
-import 'utils/base_url_helper.dart';
+import 'app_state.dart';
+import 'screens/key_confirmation_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/message_send_screen.dart';
+import 'screens/onboarding_screen.dart';
+import 'screens/registration_screen.dart';
+import 'services/api_client.dart';
+import 'services/dilithium_service.dart';
 
 void main() {
-  runApp(const PQCMessengerApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const PQCMessengerRoot());
 }
 
-class PQCMessengerApp extends StatelessWidget {
-  const PQCMessengerApp({super.key});
+class PQCMessengerRoot extends StatefulWidget {
+  const PQCMessengerRoot({super.key});
+
+  @override
+  State<PQCMessengerRoot> createState() => _PQCMessengerRootState();
+}
+
+class _PQCMessengerRootState extends State<PQCMessengerRoot> {
+  late final AppState _appState;
+
+  @override
+  void initState() {
+    super.initState();
+    _appState = AppState(
+      apiClient: ApiClient(),
+      dilithiumService: const DilithiumService(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _appState.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final baseUrl = BaseUrlHelper.getBaseUrl();
-
-    return MaterialApp(
-      title: 'PQC Messenger',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('PQC Messenger'),
+    return AppStateProvider(
+      notifier: _appState,
+      child: MaterialApp(
+        title: 'PQC Messenger',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Backend base URL:',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                baseUrl,
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ),
+        initialRoute: OnboardingScreen.routeName,
+        routes: {
+          OnboardingScreen.routeName: (_) => const OnboardingScreen(),
+          RegistrationScreen.routeName: (_) => const RegistrationScreen(),
+          LoginScreen.routeName: (_) => const LoginScreen(),
+          KeyConfirmationScreen.routeName: (_) =>
+              const KeyConfirmationScreen(),
+          MessageSendScreen.routeName: (_) => const MessageSendScreen(),
+        },
       ),
     );
   }

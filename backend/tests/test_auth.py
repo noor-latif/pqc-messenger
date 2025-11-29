@@ -41,3 +41,4 @@ def test_duplicate_email_rejected(client: TestClient) -> None:
     assert second_resp.json()["detail"] == "A user with this email already exists."
 
 
+

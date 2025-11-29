@@ -16,3 +16,4 @@ def test_blocked_origin_has_no_cors_headers(client: TestClient) -> None:
     assert resp.headers.get("access-control-allow-origin") is None
 
 
+

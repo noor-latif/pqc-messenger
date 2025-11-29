@@ -3,9 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pqc_messenger/main.dart';
 
 void main() {
-  testWidgets('app renders base URL helper text', (widgetTester) async {
-    await widgetTester.pumpWidget(const PQCMessengerApp());
+  testWidgets('onboarding screen renders hero copy', (widgetTester) async {
+    await widgetTester.pumpWidget(const PQCMessengerRoot());
+    await widgetTester.pumpAndSettle();
 
-    expect(find.textContaining('Backend base URL'), findsOneWidget);
+    expect(find.text('Post-Quantum Secure Messaging'), findsOneWidget);
+    expect(find.text('Get Started'), findsOneWidget);
   });
 }
