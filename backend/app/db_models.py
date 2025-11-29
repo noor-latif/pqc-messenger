@@ -5,7 +5,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, String, Text, TypeDecorator
 
-from app.database import Base
+from database import Base
 
 
 class GUID(TypeDecorator):

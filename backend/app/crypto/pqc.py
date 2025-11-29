@@ -140,3 +140,4 @@ def decode_key_base64(key_b64: str) -> bytes:
     """Decode a base64-encoded key."""
     return base64.b64decode(key_b64)
 
+

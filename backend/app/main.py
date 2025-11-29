@@ -5,9 +5,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.auth import router as auth_router
-from app.config import get_settings
-from app.database import init_db
+from auth import router as auth_router
+from config import get_settings
+from database import init_db
 
 settings = get_settings()
 

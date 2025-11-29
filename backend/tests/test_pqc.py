@@ -61,3 +61,4 @@ def test_key_encoding():
     
     assert decoded_private == keypair.private_key
 
+

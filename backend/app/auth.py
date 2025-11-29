@@ -3,17 +3,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app import auth_models
-from app.crypto.jwt import create_jwt_token
-from app.crypto.password import verify_password
-from app.crypto.pqc import (
+import auth_models
+from crypto.jwt import create_jwt_token
+from crypto.password import verify_password
+from crypto.pqc import (
     decapsulate,
     decode_key_base64,
     encapsulate,
     encode_key_base64,
 )
-from app.database import get_db
-from app.repositories import find_user_by_email
+from database import get_db
+from repositories import find_user_by_email
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
@@ -61,8 +61,7 @@ def login(
             
             # In a real flow, client sends ciphertext, server decapsulates
             # For MVP, we derive shared secret server-side to wrap JWT signing
-            from app.crypto.pqc import encapsulate as kem_encapsulate
-            encapsulation_result = kem_encapsulate(public_key_bytes)
+            encapsulation_result = encapsulate(public_key_bytes)
             
             # Derive shared secret (in real flow, client would send ciphertext)
             # Server uses this to enhance JWT security

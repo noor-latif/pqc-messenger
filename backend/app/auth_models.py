@@ -16,3 +16,4 @@ class LoginResponse(BaseModel):
     token: str
     redirect: str = "/dashboard"
 
+

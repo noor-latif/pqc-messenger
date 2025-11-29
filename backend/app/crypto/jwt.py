@@ -6,7 +6,7 @@ from uuid import UUID
 
 import jwt
 
-from app.config import get_settings
+from config import get_settings
 
 settings = get_settings()
 
@@ -62,4 +62,5 @@ def decode_jwt_token(token: str) -> Optional[dict]:
         return None
     except jwt.InvalidTokenError:
         return None
+
 

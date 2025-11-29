@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-from app.config import get_settings
+from config import get_settings
 
 settings = get_settings()
 
@@ -33,6 +33,6 @@ def get_db():
 
 def init_db():
     """Initialize database tables."""
-    from app.db_models import User  # noqa: F401
+    from db_models import User  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
